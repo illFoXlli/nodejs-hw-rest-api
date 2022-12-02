@@ -1,4 +1,4 @@
-const service = require('../service');
+const service = require('../service/contact.service.js');
 
 const get = async (req, res, next) => {
   try {
@@ -46,10 +46,12 @@ const getById = async (req, res, next) => {
 const create = async (req, res, next) => {
   const { name, email, phone } = req.body;
   try {
+
     const result = await service.createContact({
       name,
       email,
-      phone
+      phone,
+      owner: req.user._id,
     });
 
     res.status(201).json({

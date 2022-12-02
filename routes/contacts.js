@@ -2,7 +2,7 @@ const express = require('express');
 const {
   postContactsValidation,
   putContactsValidation,
-} = require('../../middlewares/validationMiddleware.js');
+} = require('../middlewares/validationMiddleware.js');
 const router = express.Router();
 
 const {
@@ -12,22 +12,20 @@ const {
   update,
   updateStatus,
   remove,
-} = require('../../controller');
+} = require('../controllers/contacts');
+const {
+  auth,
+} = require('../middlewares/auth.js');
 
-router.get('/', get);
-
-router.get('/:contactId', getById);
-
-router.post('/', putContactsValidation, create);
-
-router.delete('/:contactId', remove);
-
+router.get('/', auth, get);
+router.get('/:contactId', auth, getById);
+router.post('/', auth, create);
+router.delete('/:contactId', auth, remove);
 router.put(
   '/:contactId',
   putContactsValidation,
   update
 );
-
 router.patch(
   '/:contactId/favorite',
   postContactsValidation,
