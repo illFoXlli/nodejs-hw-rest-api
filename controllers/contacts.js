@@ -68,7 +68,7 @@ const create = async (req, res, next) => {
 const update = async (req, res, next) => {
   const { contactId } = req.params;
   const { name, email, phone } = req.body;
-  console.log(contactId);
+
   try {
     const result = await service.updateContact(
       contactId,
@@ -103,7 +103,6 @@ const updateStatus = async (req, res, next) => {
       contactId,
       { favorite , updateAt: new Date()}
     );
-    console.log(result);
     if (result) {
       res.json({
         status: 'success',

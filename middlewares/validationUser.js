@@ -1,5 +1,4 @@
 const Joi = require('joi');
-// Joi.objectId = require('joi-objectid')(Joi);
 const {
   HttpCode,
 } = require('../config/constants');
@@ -20,9 +19,6 @@ const schemaLogin = Joi.object({
     .min(8)
     .required(),
 });
-
-
-
 
 const validate = async (
   schema,
@@ -59,7 +55,6 @@ module.exports.validateRegistration = async (
   );
 };
 
-
 module.exports.validateLogin = async (
   req,
   res,
@@ -72,4 +67,3 @@ module.exports.validateLogin = async (
     next
   );
 };
-
