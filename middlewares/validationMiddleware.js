@@ -20,7 +20,7 @@ const putContactsValidation = (
       .optional(),
 
     phone: Joi.string()
-      .alphanum()
+      // .alphanum()
       .min(4)
       .max(10)
       .optional(),

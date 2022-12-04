@@ -4,13 +4,17 @@ const { Schema } = mongoose;
 const contactsSchema = new Schema({
   name: {
     type: String,
-    required: [true, 'Set name for contact'],
+    required: [true, ' name is require'],
+    minlength: 3,
+    maxlength: 30
   },
   email: {
     type: String,
+    required: [true, 'email is require'],
   },
   phone: {
     type: String,
+    // match: /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/,
   },
   favorite: {
     type: Boolean,
@@ -18,6 +22,12 @@ const contactsSchema = new Schema({
   },
   createdAt: { type: Date, default: Date.now },
   updateAt: { type: Date },
+
+  owner: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'user',
+  }
+  // { versionKey: false, timestamps: true }
 });
 
 const Contact = mongoose.model(
