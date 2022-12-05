@@ -1,13 +1,13 @@
 const jwt = require('jsonwebtoken');
-const {
-  Users,
-} = require('../service/schemas/userMadal');
-const {
-  HttpCode,
-} = require('../config/constants');
+const { Users } = require('../service/schemas/userMadal');
+const { HttpCode } = require('../config/constants');
 require('dotenv').config();
 const secret = process.env.SECRET;
 const bcrypt = require('bcryptjs');
+const gravatar = require('gravatar/lib/gravatar');
+const fs = require('fs/promises');
+const path = require('path');
+const Jimp = require('jimp');
 
 // signup
 const signup = async (req, res, next) => {
@@ -22,31 +22,22 @@ const signup = async (req, res, next) => {
     });
   }
   try {
-    const hashedPassword = await bcrypt.hash(
-      password,
-      10
-    );
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const avatarURL = gravatar.url(email);
 
     const newUser = await Users.create({
       name,
       email,
       password: hashedPassword,
+      avatar: avatarURL,
     });
-    console.log(newUser);
 
-    const token = jwt.sign(
-      { _id: newUser._id },
-      secret,
-      {
-        expiresIn: '10h',
-      }
-    );
+    const token = jwt.sign({ _id: newUser._id }, secret, {
+      expiresIn: '10h',
+    });
 
-    await Users.findByIdAndUpdate(
-      { _id: newUser._id },
-      { token },
-      { new: true }
-    );
+    await Users.findByIdAndUpdate({ _id: newUser._id }, { token }, { new: true });
 
     return res.status(HttpCode.CREATED).json({
       status: 'success',
@@ -56,7 +47,8 @@ const signup = async (req, res, next) => {
         id: newUser.id,
         name: newUser.name,
         email: newUser.email,
-        token: token
+        token: token,
+        avatar: avatarURL,
       },
     });
   } catch (e) {
@@ -90,28 +82,46 @@ const login = async (req, res, next) => {
     token,
     user: {
       email: user.email,
-      subscription: user.subscription
-    }});
+      subscription: user.subscription,
+    },
+  });
 };
 
 // logout
 const logout = async (req, res, next) => {
   const id = req.user._id;
-  await Users.updateOne({ _id: id }, { token: null })
-  return res.status(HttpCode.NO_CONTENT).json({ messange: "No Content" });
+  await Users.updateOne({ _id: id }, { token: null });
+  return res.status(HttpCode.NO_CONTENT).json({ messange: 'No Content' });
 };
 
 // current
 const current = async (req, res, next) => {
-  const { username, email, subscription  } = req.user;
+  const { username, email, subscription } = req.user;
   res.status(HttpCode.OK).json({
     status: 'success',
     code: 200,
     data: {
       message: `Authorization was successful: ${username}`,
       email: email,
-      subscription: subscription
+      subscription: subscription,
     },
+  });
+};
+
+// updateAvatar
+const updateAvatar = async (req, res) => {
+  const avatarsPath = path.join(__dirname, '../', 'public', 'avatars');
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+  const fileName = `${_id}_${originalname}`;
+  const resultUpload = path.join(avatarsPath, fileName);
+  await fs.rename(tempUpload, resultUpload);
+  const resizeImage = await Jimp.read(resultUpload);
+  resizeImage.resize(250, 250).write(resultUpload);
+  const avatarURL = path.join('avatars', fileName);
+  await Users.updateOne({ _id }, { avatar: avatarURL });
+  res.json({
+    avatarURL,
   });
 };
 
@@ -120,4 +130,5 @@ module.exports = {
   login,
   logout,
   current,
+  updateAvatar,
 };
