@@ -1,21 +1,13 @@
 const Joi = require('joi');
 
-const putContactsValidation = (
-  req,
-  res,
-  next
-) => {
+const putContactsValidation = (req, res, next) => {
   const schema = Joi.object({
-    name: Joi.string()
-      .alphanum()
-      .min(3)
-      .max(30)
-      .optional(),
+    name: Joi.string().alphanum().min(3).max(30).optional(),
 
     email: Joi.string()
       .email({
         minDomainSegments: 2,
-        tlds: { allow: ['com', 'net'] },
+        tlds: { allow: ['com', 'net',"gmail.com"] },
       })
       .optional(),
 
@@ -25,9 +17,7 @@ const putContactsValidation = (
       .max(10)
       .optional(),
   });
-  const validationResult = schema.validate(
-    req.body
-  );
+  const validationResult = schema.validate(req.body);
   if (validationResult.error) {
     return res.json({
       message: 'Not found',
@@ -38,18 +28,12 @@ const putContactsValidation = (
   next();
 };
 
-const postContactsValidation = (
-  req,
-  res,
-  next
-) => {
+const postContactsValidation = (req, res, next) => {
   const schema = Joi.object({
     favorite: Joi.boolean(),
   });
 
-  const validationResult = schema.validate(
-    req.body
-  );
+  const validationResult = schema.validate(req.body);
   if (validationResult.error) {
     return res.json({
       message: 'missing required name field',
