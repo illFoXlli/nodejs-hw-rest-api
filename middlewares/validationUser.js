@@ -5,7 +5,8 @@ const {
 
 const schemaRegistration = Joi.object({
   name: Joi.string().min(1).max(30).optional(),
-  email: Joi.string().email().required(),
+  email: Joi.string(),
+  // .email().required(),
   password: Joi.string()
     .alphanum()
     .min(8)

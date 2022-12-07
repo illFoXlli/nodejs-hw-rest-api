@@ -6,6 +6,8 @@ const {
   logout,
   current,
   updateAvatar,
+  verifyUser,
+  verifySecond
 } = require('../controllers/users');
 const { auth } = require('../middlewares/auth');
 const upload = require('../middlewares/multerFile');
@@ -19,6 +21,8 @@ router.post('/login',validateLogin, login);
 router.get('/logout', auth, logout);
 router.get('/current', auth, current);
 router.patch('/avatars', auth, upload.single("avatars"), updateAvatar);
+router.get('/verify/:token', verifyUser);
+router.post('/verify', verifySecond);
 
 module.exports = router;
 
